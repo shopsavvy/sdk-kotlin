@@ -1,0 +1,143 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.shopsavvy",
+    "module": "shopsavvy-sdk-kotlin",
+    "version": "1.0.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.2"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 21,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.9.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "shopsavvy-sdk-kotlin-1.0.0.jar",
+          "url": "shopsavvy-sdk-kotlin-1.0.0.jar",
+          "size": 135373,
+          "sha512": "404aac7ed074063c776525a5291e47ce8e65e0afe4b9980ca2bcb140eb406d048bdb4550c2d4fda4861e5fb69363d2bddae9a3c8c352d2b35b47e7102bca19a0",
+          "sha256": "ed8a886b8494729f57a90d745fe209cbc83ec0d991cd7a8efe2df699ae48285d",
+          "sha1": "1f94f10d3d7eb81dd6d2d9c8259e507cde917017",
+          "md5": "21a05a321d806be889f9e15005c4f91d"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 21,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.squareup.okhttp3",
+          "module": "okhttp",
+          "version": {
+            "requires": "4.11.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-serialization-json",
+          "version": {
+            "requires": "1.6.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-core",
+          "version": {
+            "requires": "1.7.3"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.9.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "shopsavvy-sdk-kotlin-1.0.0.jar",
+          "url": "shopsavvy-sdk-kotlin-1.0.0.jar",
+          "size": 135373,
+          "sha512": "404aac7ed074063c776525a5291e47ce8e65e0afe4b9980ca2bcb140eb406d048bdb4550c2d4fda4861e5fb69363d2bddae9a3c8c352d2b35b47e7102bca19a0",
+          "sha256": "ed8a886b8494729f57a90d745fe209cbc83ec0d991cd7a8efe2df699ae48285d",
+          "sha1": "1f94f10d3d7eb81dd6d2d9c8259e507cde917017",
+          "md5": "21a05a321d806be889f9e15005c4f91d"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "shopsavvy-sdk-kotlin-1.0.0-sources.jar",
+          "url": "shopsavvy-sdk-kotlin-1.0.0-sources.jar",
+          "size": 4813,
+          "sha512": "a5070f8154c7777036ad9d747899e26413e0c1671f5788f020bc51acbdeb556b7f6829389aaecd2c4f8b5939fbe538dc0996f4214491a15d1af7175ea3688fa8",
+          "sha256": "2062c39bf30650d3267a2ae62aad5ec011ef7d03d9a2f89884f75866a518ec82",
+          "sha1": "6ace740ee5eabf83549f9719dcb34543acf4c4ed",
+          "md5": "e828a67c9ddbd87b1a175db9abcb0e2c"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "shopsavvy-sdk-kotlin-1.0.0-javadoc.jar",
+          "url": "shopsavvy-sdk-kotlin-1.0.0-javadoc.jar",
+          "size": 261,
+          "sha512": "fe0c200f0178accf8127648ee16a1cc96e936732b5374be8b1cc57c211a720090213e5bb7d047256d372abdfcc3b6b21af750e7740cd0c14464beb007ccadcd4",
+          "sha256": "eb10ed33a76caab01a7b109c64c39f60cf9c4ecd6f90d9a7291eb5ae00e3513a",
+          "sha1": "66c3dddf53b6c064068ea2f657e9044513e58d40",
+          "md5": "0305f2bfeae21c2535abdfbc18e6d270"
+        }
+      ]
+    }
+  ]
+}
