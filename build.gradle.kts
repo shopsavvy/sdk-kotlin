@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.shopsavvy"
-version = "1.0.0"
+version = "1.0.1"
 description = "Official Kotlin/JVM SDK for ShopSavvy Data API - Access product data, pricing, and price history"
 
 java {
@@ -94,13 +94,7 @@ signing {
     sign(publishing.publications["maven"])
 }
 
-// For manual upload to Central Portal, build the bundle
-tasks.register<Zip>("createCentralBundle") {
-    dependsOn("publishToMavenLocal")
-    archiveFileName.set("central-bundle.zip")
-    destinationDirectory.set(layout.buildDirectory.dir("central-publishing"))
-    
-    from(layout.buildDirectory.dir("publications/maven")) {
-        include("**/*")
-    }
+// Rename artifact to match Maven naming convention
+tasks.named<Jar>("jar") {
+    archiveBaseName.set("shopsavvy-sdk-kotlin")
 }

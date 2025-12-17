@@ -3,6 +3,21 @@ package com.shopsavvy.sdk
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+// MARK: - API Meta
+
+/**
+ * API response metadata containing credit usage info
+ */
+@Serializable
+data class ApiMeta(
+    @SerialName("credits_used")
+    val creditsUsed: Int,
+    @SerialName("credits_remaining")
+    val creditsRemaining: Int,
+    @SerialName("rate_limit_remaining")
+    val rateLimitRemaining: Int? = null
+)
+
 // MARK: - API Response
 
 /**
@@ -10,21 +25,47 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class ApiResponse<T>(
+    val success: Boolean,
     val data: T,
-    val meta: Meta
+    val message: String? = null,
+    val meta: ApiMeta? = null
+) {
+    /** Get credits used from meta object */
+    fun creditsUsed(): Int = meta?.creditsUsed ?: 0
+
+    /** Get credits remaining from meta object */
+    fun creditsRemaining(): Int = meta?.creditsRemaining ?: 0
+}
+
+// MARK: - Pagination
+
+/**
+ * Pagination info for search results
+ */
+@Serializable
+data class PaginationInfo(
+    val total: Int,
+    val limit: Int,
+    val offset: Int,
+    val returned: Int
 )
 
 /**
- * API response metadata
+ * Product search result with pagination
  */
 @Serializable
-data class Meta(
-    val requestId: String? = null,
-    val timestamp: String? = null,
-    val cached: Boolean? = null,
-    @SerialName("credits_used")
-    val creditsUsed: Int? = null
-)
+data class ProductSearchResult(
+    val success: Boolean,
+    val data: List<ProductDetails>,
+    val pagination: PaginationInfo? = null,
+    val meta: ApiMeta? = null
+) {
+    /** Get credits used from meta object */
+    fun creditsUsed(): Int = meta?.creditsUsed ?: 0
+
+    /** Get credits remaining from meta object */
+    fun creditsRemaining(): Int = meta?.creditsRemaining ?: 0
+}
 
 // MARK: - Product Models
 
@@ -33,21 +74,64 @@ data class Meta(
  */
 @Serializable
 data class ProductDetails(
-    val id: String,
-    val name: String,
-    val description: String? = null,
+    val title: String,
+    val shopsavvy: String,
     val brand: String? = null,
     val category: String? = null,
-    val upc: String? = null,
-    val asin: String? = null,
-    @SerialName("model_number")
-    val modelNumber: String? = null,
     val images: List<String>? = null,
-    val specifications: Map<String, String>? = null,
-    @SerialName("created_at")
-    val createdAt: String? = null,
-    @SerialName("updated_at")
-    val updatedAt: String? = null
+    val barcode: String? = null,
+    val amazon: String? = null,
+    val model: String? = null,
+    val mpn: String? = null,
+    val color: String? = null
+) {
+    // Backward-compatible aliases
+
+    /** @deprecated Use title instead */
+    @Deprecated("Use title instead", ReplaceWith("title"))
+    val name: String get() = title
+
+    /** @deprecated Use shopsavvy instead */
+    @Deprecated("Use shopsavvy instead", ReplaceWith("shopsavvy"))
+    val productId: String get() = shopsavvy
+
+    /** @deprecated Use amazon instead */
+    @Deprecated("Use amazon instead", ReplaceWith("amazon"))
+    val asin: String? get() = amazon
+
+    /** @deprecated Use images?.firstOrNull() instead */
+    @Deprecated("Use images?.firstOrNull() instead", ReplaceWith("images?.firstOrNull()"))
+    val imageUrl: String? get() = images?.firstOrNull()
+}
+
+/**
+ * Product with nested offers (returned by offers endpoint)
+ */
+@Serializable
+data class ProductWithOffers(
+    val title: String,
+    val shopsavvy: String,
+    val brand: String? = null,
+    val category: String? = null,
+    val images: List<String>? = null,
+    val barcode: String? = null,
+    val amazon: String? = null,
+    val model: String? = null,
+    val mpn: String? = null,
+    val color: String? = null,
+    val offers: List<Offer> = emptyList()
+)
+
+// MARK: - Offer Models
+
+/**
+ * Historical price point
+ */
+@Serializable
+data class PriceHistoryEntry(
+    val date: String,
+    val price: Double,
+    val availability: String
 )
 
 /**
@@ -55,45 +139,50 @@ data class ProductDetails(
  */
 @Serializable
 data class Offer(
-    val retailer: String,
+    val id: String,
+    val retailer: String? = null,
     val price: Double? = null,
     val currency: String? = null,
     val availability: String? = null,
     val condition: String? = null,
-    @SerialName("shipping_cost")
-    val shippingCost: Double? = null,
+    @SerialName("URL")
     val url: String? = null,
-    @SerialName("last_updated")
-    val lastUpdated: String? = null
-)
+    val seller: String? = null,
+    val timestamp: String? = null,
+    val history: List<PriceHistoryEntry>? = null
+) {
+    // Backward-compatible aliases
 
-/**
- * Historical price point
- */
-@Serializable
-data class PricePoint(
-    val date: String,
-    val price: Double? = null,
-    val availability: String? = null
-)
+    /** @deprecated Use id instead */
+    @Deprecated("Use id instead", ReplaceWith("id"))
+    val offerId: String get() = id
+
+    /** @deprecated Use url instead */
+    @Deprecated("Use url instead", ReplaceWith("url"))
+    val offerUrl: String? get() = url
+
+    /** @deprecated Use timestamp instead */
+    @Deprecated("Use timestamp instead", ReplaceWith("timestamp"))
+    val lastUpdated: String? get() = timestamp
+}
 
 /**
  * Offer with price history
  */
 @Serializable
 data class OfferWithHistory(
-    val retailer: String,
+    val id: String,
+    val retailer: String? = null,
     val price: Double? = null,
     val currency: String? = null,
     val availability: String? = null,
     val condition: String? = null,
-    @SerialName("shipping_cost")
-    val shippingCost: Double? = null,
+    @SerialName("URL")
     val url: String? = null,
-    @SerialName("last_updated")
-    val lastUpdated: String? = null,
+    val seller: String? = null,
+    val timestamp: String? = null,
     @SerialName("price_history")
-    val priceHistory: List<PricePoint>? = null
+    val priceHistory: List<PriceHistoryEntry> = emptyList()
 )
 
 // MARK: - Monitoring Models
@@ -113,10 +202,20 @@ data class ScheduleRequest(
  */
 @Serializable
 data class ScheduleResponse(
-    val success: Boolean,
-    val message: String? = null,
-    val identifier: String? = null,
-    val frequency: String? = null
+    val scheduled: Boolean,
+    @SerialName("product_id")
+    val productId: String
+)
+
+/**
+ * Response from batch scheduling
+ */
+@Serializable
+data class ScheduleBatchResponse(
+    val identifier: String,
+    val scheduled: Boolean,
+    @SerialName("product_id")
+    val productId: String
 )
 
 /**
@@ -124,13 +223,15 @@ data class ScheduleResponse(
  */
 @Serializable
 data class ScheduledProduct(
+    @SerialName("product_id")
+    val productId: String,
     val identifier: String,
     val frequency: String,
     val retailer: String? = null,
     @SerialName("created_at")
-    val createdAt: String? = null,
-    @SerialName("last_updated")
-    val lastUpdated: String? = null
+    val createdAt: String,
+    @SerialName("last_refreshed")
+    val lastRefreshed: String? = null
 )
 
 /**
@@ -146,28 +247,68 @@ data class RemoveRequest(
  */
 @Serializable
 data class RemoveResponse(
-    val success: Boolean,
-    val message: String? = null,
-    val identifier: String? = null
+    val removed: Boolean
+)
+
+/**
+ * Response from batch removal
+ */
+@Serializable
+data class RemoveBatchResponse(
+    val identifier: String,
+    val removed: Boolean
 )
 
 // MARK: - Usage Models
+
+/**
+ * Current billing period details
+ */
+@Serializable
+data class UsagePeriod(
+    @SerialName("start_date")
+    val startDate: String,
+    @SerialName("end_date")
+    val endDate: String,
+    @SerialName("credits_used")
+    val creditsUsed: Int,
+    @SerialName("credits_limit")
+    val creditsLimit: Int,
+    @SerialName("credits_remaining")
+    val creditsRemaining: Int,
+    @SerialName("requests_made")
+    val requestsMade: Int
+)
 
 /**
  * API usage information model
  */
 @Serializable
 data class UsageInfo(
-    @SerialName("credits_used")
-    val creditsUsed: Int? = null,
-    @SerialName("credits_remaining")
-    val creditsRemaining: Int? = null,
-    @SerialName("credits_limit")
-    val creditsLimit: Int? = null,
-    @SerialName("reset_date")
-    val resetDate: String? = null,
-    @SerialName("current_period_start")
-    val currentPeriodStart: String? = null,
-    @SerialName("current_period_end")
-    val currentPeriodEnd: String? = null
-)
+    @SerialName("current_period")
+    val currentPeriod: UsagePeriod,
+    @SerialName("usage_percentage")
+    val usagePercentage: Double
+) {
+    // Backward-compatible methods
+
+    /** @deprecated Use currentPeriod.creditsUsed instead */
+    @Deprecated("Use currentPeriod.creditsUsed instead", ReplaceWith("currentPeriod.creditsUsed"))
+    fun getCreditsUsed(): Int = currentPeriod.creditsUsed
+
+    /** @deprecated Use currentPeriod.creditsRemaining instead */
+    @Deprecated("Use currentPeriod.creditsRemaining instead", ReplaceWith("currentPeriod.creditsRemaining"))
+    fun getCreditsRemaining(): Int = currentPeriod.creditsRemaining
+
+    /** @deprecated Use currentPeriod.creditsLimit instead */
+    @Deprecated("Use currentPeriod.creditsLimit instead", ReplaceWith("currentPeriod.creditsLimit"))
+    fun getCreditsTotal(): Int = currentPeriod.creditsLimit
+
+    /** @deprecated Use currentPeriod.startDate instead */
+    @Deprecated("Use currentPeriod.startDate instead", ReplaceWith("currentPeriod.startDate"))
+    fun getBillingPeriodStart(): String = currentPeriod.startDate
+
+    /** @deprecated Use currentPeriod.endDate instead */
+    @Deprecated("Use currentPeriod.endDate instead", ReplaceWith("currentPeriod.endDate"))
+    fun getBillingPeriodEnd(): String = currentPeriod.endDate
+}
