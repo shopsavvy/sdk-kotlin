@@ -265,6 +265,48 @@ class ShopSavvyClient @JvmOverloads constructor(
     }
 
     /**
+     * Look up multiple products at once (sync for <=20, async for >20)
+     */
+    suspend fun batchLookup(identifiers: List<String>, include: List<String>? = null): Map<String, Any> {
+        val body = mutableMapOf<String, Any>("identifiers" to identifiers)
+        include?.let { body["include"] = it }
+        val json = kotlinx.serialization.json.Json.encodeToString(kotlinx.serialization.serializer<Map<String, kotlinx.serialization.json.JsonElement>>(), emptyMap())
+        // Use raw OkHttp for POST with JSON body
+        val mediaType = "application/json; charset=utf-8".toMediaType()
+        val jsonBody = org.json.JSONObject(body as Map<*, *>).toString()
+        val request = Request.Builder()
+            .url("$baseUrl/products/batch")
+            .addHeader("Authorization", "Bearer $apiKey")
+            .addHeader("User-Agent", "ShopSavvy-Kotlin-SDK/$VERSION")
+            .post(jsonBody.toRequestBody(mediaType))
+            .build()
+        return withContext(Dispatchers.IO) {
+            val response = okHttpClient.newCall(request).execute()
+            val responseBody = response.body?.string() ?: "{}"
+            @Suppress("UNCHECKED_CAST")
+            org.json.JSONObject(responseBody).toMap() as Map<String, Any>
+        }
+    }
+
+    /**
+     * Poll for async batch job results
+     */
+    suspend fun getBatchStatus(batchId: String): Map<String, Any> {
+        val request = Request.Builder()
+            .url("$baseUrl/batch/$batchId")
+            .addHeader("Authorization", "Bearer $apiKey")
+            .addHeader("User-Agent", "ShopSavvy-Kotlin-SDK/$VERSION")
+            .get()
+            .build()
+        return withContext(Dispatchers.IO) {
+            val response = okHttpClient.newCall(request).execute()
+            val responseBody = response.body?.string() ?: "{}"
+            @Suppress("UNCHECKED_CAST")
+            org.json.JSONObject(responseBody).toMap() as Map<String, Any>
+        }
+    }
+
+    /**
      * Get TLDR review for a product
      */
     suspend fun getProductReview(identifier: String): ReviewResponse {
