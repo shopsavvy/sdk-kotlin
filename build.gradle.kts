@@ -55,20 +55,21 @@ tasks.compileTestKotlin {
 publishing {
     publications {
         create<MavenPublication>("maven") {
+            artifactId = "shopsavvy-sdk-kotlin"
             from(components["java"])
-            
+
             pom {
                 name.set("ShopSavvy Data API Kotlin SDK")
                 description.set("Official Kotlin SDK for ShopSavvy Data API - Access product data, pricing, and price history")
                 url.set("https://shopsavvy.com/data")
-                
+
                 licenses {
                     license {
                         name.set("MIT License")
                         url.set("https://opensource.org/licenses/MIT")
                     }
                 }
-                
+
                 developers {
                     developer {
                         name.set("ShopSavvy Team")
@@ -77,7 +78,7 @@ publishing {
                         organizationUrl.set("https://shopsavvy.com")
                     }
                 }
-                
+
                 scm {
                     connection.set("scm:git:git://github.com/shopsavvy/sdk-kotlin.git")
                     developerConnection.set("scm:git:ssh://github.com:shopsavvy/sdk-kotlin.git")
@@ -86,7 +87,17 @@ publishing {
             }
         }
     }
-    
+
+    repositories {
+        maven {
+            name = "OSSRH"
+            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = findProperty("ossrhUsername") as String? ?: System.getenv("OSSRH_USERNAME")
+                password = findProperty("ossrhPassword") as String? ?: System.getenv("OSSRH_PASSWORD")
+            }
+        }
+    }
 }
 
 signing {

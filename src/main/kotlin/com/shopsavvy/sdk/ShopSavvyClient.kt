@@ -12,7 +12,7 @@ import java.util.regex.Pattern
 /**
  * SDK version
  */
-const val VERSION = "1.0.1"
+const val VERSION = "1.1.0"
 
 /**
  * Official Kotlin client for ShopSavvy Data API
@@ -242,6 +242,33 @@ class ShopSavvyClient @JvmOverloads constructor(
      */
     suspend fun getUsage(): ApiResponse<UsageInfo> {
         val url = "$baseUrl/usage"
+        return executeRequest(url)
+    }
+
+    /**
+     * Browse current shopping deals
+     */
+    suspend fun getDeals(
+        sort: String = "hot",
+        limit: Int = 25,
+        offset: Int = 0,
+        category: String? = null,
+        retailer: String? = null,
+        grade: String? = null
+    ): DealsResponse {
+        val params = mutableListOf("sort=$sort", "limit=$limit", "offset=$offset")
+        category?.let { params.add("category=$it") }
+        retailer?.let { params.add("retailer=$it") }
+        grade?.let { params.add("grade=$it") }
+        val url = "$baseUrl/deals?${params.joinToString("&")}"
+        return executeRequest(url)
+    }
+
+    /**
+     * Get TLDR review for a product
+     */
+    suspend fun getProductReview(identifier: String): ReviewResponse {
+        val url = "$baseUrl/products/reviews?id=${java.net.URLEncoder.encode(identifier, "UTF-8")}"
         return executeRequest(url)
     }
 

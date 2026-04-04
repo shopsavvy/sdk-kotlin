@@ -3,7 +3,7 @@
   "component": {
     "group": "com.shopsavvy",
     "module": "shopsavvy-sdk-kotlin",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "attributes": {
       "org.gradle.status": "release"
     }
@@ -36,13 +36,13 @@
       ],
       "files": [
         {
-          "name": "shopsavvy-sdk-kotlin-1.0.0.jar",
-          "url": "shopsavvy-sdk-kotlin-1.0.0.jar",
-          "size": 135373,
-          "sha512": "404aac7ed074063c776525a5291e47ce8e65e0afe4b9980ca2bcb140eb406d048bdb4550c2d4fda4861e5fb69363d2bddae9a3c8c352d2b35b47e7102bca19a0",
-          "sha256": "ed8a886b8494729f57a90d745fe209cbc83ec0d991cd7a8efe2df699ae48285d",
-          "sha1": "1f94f10d3d7eb81dd6d2d9c8259e507cde917017",
-          "md5": "21a05a321d806be889f9e15005c4f91d"
+          "name": "shopsavvy-sdk-kotlin-1.0.1.jar",
+          "url": "shopsavvy-sdk-kotlin-1.0.1.jar",
+          "size": 180279,
+          "sha512": "84c29b465c54bb5a6c4d534864c4a261f65f04385c83e0d210ebdb3025f4f4114abf0261cd9eb3e8b05b4ca5bdb1dbee4ed2de2c960647d6ed5db1a7b5aeccbb",
+          "sha256": "aea92efad72213f0762e7aa7993a90590a0652cb12fff49c7c06c4111d2f297e",
+          "sha1": "b7a6b00b4ea1175f3071f5eaf04f94ba8c71cc77",
+          "md5": "530e3ad45861f10d7fa6ab3a20ed09d6"
         }
       ]
     },
@@ -89,13 +89,13 @@
       ],
       "files": [
         {
-          "name": "shopsavvy-sdk-kotlin-1.0.0.jar",
-          "url": "shopsavvy-sdk-kotlin-1.0.0.jar",
-          "size": 135373,
-          "sha512": "404aac7ed074063c776525a5291e47ce8e65e0afe4b9980ca2bcb140eb406d048bdb4550c2d4fda4861e5fb69363d2bddae9a3c8c352d2b35b47e7102bca19a0",
-          "sha256": "ed8a886b8494729f57a90d745fe209cbc83ec0d991cd7a8efe2df699ae48285d",
-          "sha1": "1f94f10d3d7eb81dd6d2d9c8259e507cde917017",
-          "md5": "21a05a321d806be889f9e15005c4f91d"
+          "name": "shopsavvy-sdk-kotlin-1.0.1.jar",
+          "url": "shopsavvy-sdk-kotlin-1.0.1.jar",
+          "size": 180279,
+          "sha512": "84c29b465c54bb5a6c4d534864c4a261f65f04385c83e0d210ebdb3025f4f4114abf0261cd9eb3e8b05b4ca5bdb1dbee4ed2de2c960647d6ed5db1a7b5aeccbb",
+          "sha256": "aea92efad72213f0762e7aa7993a90590a0652cb12fff49c7c06c4111d2f297e",
+          "sha1": "b7a6b00b4ea1175f3071f5eaf04f94ba8c71cc77",
+          "md5": "530e3ad45861f10d7fa6ab3a20ed09d6"
         }
       ]
     },
@@ -109,13 +109,13 @@
       },
       "files": [
         {
-          "name": "shopsavvy-sdk-kotlin-1.0.0-sources.jar",
-          "url": "shopsavvy-sdk-kotlin-1.0.0-sources.jar",
-          "size": 4813,
-          "sha512": "a5070f8154c7777036ad9d747899e26413e0c1671f5788f020bc51acbdeb556b7f6829389aaecd2c4f8b5939fbe538dc0996f4214491a15d1af7175ea3688fa8",
-          "sha256": "2062c39bf30650d3267a2ae62aad5ec011ef7d03d9a2f89884f75866a518ec82",
-          "sha1": "6ace740ee5eabf83549f9719dcb34543acf4c4ed",
-          "md5": "e828a67c9ddbd87b1a175db9abcb0e2c"
+          "name": "shopsavvy-sdk-kotlin-1.0.1-sources.jar",
+          "url": "shopsavvy-sdk-kotlin-1.0.1-sources.jar",
+          "size": 5643,
+          "sha512": "529f313333841dd5880c3c24a4598a333c3fced633095dbfe1811ed0a23242b82363a495a74ff3c4efb056569cc89eec0a1045cbc66c59d04fe73cd09273af62",
+          "sha256": "b8ab345e727dce07a8ba9e02c39c2d2689988d1e548b2f7f745f1b272fb49aa7",
+          "sha1": "4bd6b7fa60152b0650c88789d490d9acac7c00d5",
+          "md5": "298f495b1f7752db6bfcd910cbe809d7"
         }
       ]
     },
@@ -129,13 +129,13 @@
       },
       "files": [
         {
-          "name": "shopsavvy-sdk-kotlin-1.0.0-javadoc.jar",
-          "url": "shopsavvy-sdk-kotlin-1.0.0-javadoc.jar",
+          "name": "shopsavvy-sdk-kotlin-1.0.1-javadoc.jar",
+          "url": "shopsavvy-sdk-kotlin-1.0.1-javadoc.jar",
           "size": 261,
-          "sha512": "fe0c200f0178accf8127648ee16a1cc96e936732b5374be8b1cc57c211a720090213e5bb7d047256d372abdfcc3b6b21af750e7740cd0c14464beb007ccadcd4",
-          "sha256": "eb10ed33a76caab01a7b109c64c39f60cf9c4ecd6f90d9a7291eb5ae00e3513a",
-          "sha1": "66c3dddf53b6c064068ea2f657e9044513e58d40",
-          "md5": "0305f2bfeae21c2535abdfbc18e6d270"
+          "sha512": "7b4359fe95d6bfb48aec9f3f0622d7b223509cdded88edd579488237b896e9b54999ee63d3e06a3b262bd558d6407e3b43f7ca75b343762916816801dfc01ecb",
+          "sha256": "1a73e1ae6e3761202140f3ea7988007c19fa4c62d375b06f90199fb6859852de",
+          "sha1": "e803556bb1d5670dca82f81250c3a5cab3d1ad7d",
+          "md5": "3df89f70a45518359b5d7f5dea2472df"
         }
       ]
     }

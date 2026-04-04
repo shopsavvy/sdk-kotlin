@@ -83,7 +83,16 @@ data class ProductDetails(
     val amazon: String? = null,
     val model: String? = null,
     val mpn: String? = null,
-    val color: String? = null
+    val color: String? = null,
+    @SerialName("title_short") val titleShort: String? = null,
+    val slug: String? = null,
+    val description: String? = null,
+    val categories: List<String>? = null,
+    val attributes: Map<String, String>? = null,
+    val rating: Map<String, kotlinx.serialization.json.JsonElement>? = null,
+    val score: Map<String, kotlinx.serialization.json.JsonElement>? = null,
+    val keywords: List<String>? = null,
+    val identifiers: Map<String, kotlinx.serialization.json.JsonElement>? = null
 ) {
     // Backward-compatible aliases
 
@@ -312,3 +321,53 @@ data class UsageInfo(
     @Deprecated("Use currentPeriod.endDate instead", ReplaceWith("currentPeriod.endDate"))
     fun getBillingPeriodEnd(): String = currentPeriod.endDate
 }
+
+// MARK: - Deals
+
+@Serializable
+data class Deal(
+    val path: String,
+    val title: String,
+    val subtitle: String? = null,
+    val description: String? = null,
+    val emoji: String? = null,
+    val grade: Map<String, kotlinx.serialization.json.JsonElement>,
+    val pricing: Map<String, kotlinx.serialization.json.JsonElement>,
+    val retailer: Map<String, String>,
+    val product: String? = null,
+    val url: String,
+    val image: Map<String, kotlinx.serialization.json.JsonElement>? = null,
+    val votes: Map<String, kotlinx.serialization.json.JsonElement>,
+    @SerialName("comment_count") val commentCount: Int = 0,
+    val tags: List<Map<String, String>>? = null,
+    @SerialName("expires_at") val expiresAt: String? = null,
+    @SerialName("created_at") val createdAt: String
+)
+
+@Serializable
+data class DealsResponse(
+    val success: Boolean,
+    val deals: List<Deal>,
+    val pagination: Map<String, kotlinx.serialization.json.JsonElement>,
+    val meta: ApiMeta? = null
+)
+
+// MARK: - Reviews
+
+@Serializable
+data class TLDRReview(
+    val slug: String,
+    val headline: String,
+    val pros: List<String> = emptyList(),
+    val cons: List<String> = emptyList(),
+    @SerialName("bottom_line") val bottomLine: String = "",
+    val scores: Map<String, kotlinx.serialization.json.JsonElement>? = null
+)
+
+@Serializable
+data class ReviewResponse(
+    val success: Boolean,
+    val product: Map<String, String>,
+    val review: TLDRReview? = null,
+    val meta: ApiMeta? = null
+)
