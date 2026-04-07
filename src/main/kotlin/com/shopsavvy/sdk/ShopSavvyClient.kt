@@ -306,6 +306,45 @@ class ShopSavvyClient @JvmOverloads constructor(
         }
     }
 
+    suspend fun createWebhook(url: String, events: List<String>): Map<String, Any> {
+        val body = org.json.JSONObject(mapOf("url" to url, "events" to events) as Map<*, *>).toString()
+        val request = Request.Builder().url("$baseUrl/webhooks")
+            .addHeader("Authorization", "Bearer $apiKey").addHeader("User-Agent", "ShopSavvy-Kotlin-SDK/$VERSION")
+            .post(body.toRequestBody("application/json; charset=utf-8".toMediaType())).build()
+        return withContext(Dispatchers.IO) {
+            @Suppress("UNCHECKED_CAST")
+            org.json.JSONObject(okHttpClient.newCall(request).execute().body?.string() ?: "{}").toMap() as Map<String, Any>
+        }
+    }
+
+    suspend fun listWebhooks(): Map<String, Any> {
+        val request = Request.Builder().url("$baseUrl/webhooks")
+            .addHeader("Authorization", "Bearer $apiKey").addHeader("User-Agent", "ShopSavvy-Kotlin-SDK/$VERSION").get().build()
+        return withContext(Dispatchers.IO) {
+            @Suppress("UNCHECKED_CAST")
+            org.json.JSONObject(okHttpClient.newCall(request).execute().body?.string() ?: "{}").toMap() as Map<String, Any>
+        }
+    }
+
+    suspend fun testWebhook(webhookId: String): Map<String, Any> {
+        val request = Request.Builder().url("$baseUrl/webhooks/$webhookId/test")
+            .addHeader("Authorization", "Bearer $apiKey").addHeader("User-Agent", "ShopSavvy-Kotlin-SDK/$VERSION")
+            .post("".toRequestBody(null)).build()
+        return withContext(Dispatchers.IO) {
+            @Suppress("UNCHECKED_CAST")
+            org.json.JSONObject(okHttpClient.newCall(request).execute().body?.string() ?: "{}").toMap() as Map<String, Any>
+        }
+    }
+
+    suspend fun deleteWebhook(webhookId: String): Map<String, Any> {
+        val request = Request.Builder().url("$baseUrl/webhooks/$webhookId")
+            .addHeader("Authorization", "Bearer $apiKey").addHeader("User-Agent", "ShopSavvy-Kotlin-SDK/$VERSION").delete().build()
+        return withContext(Dispatchers.IO) {
+            @Suppress("UNCHECKED_CAST")
+            org.json.JSONObject(okHttpClient.newCall(request).execute().body?.string() ?: "{}").toMap() as Map<String, Any>
+        }
+    }
+
     /**
      * Get TLDR review for a product
      */
