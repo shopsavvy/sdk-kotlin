@@ -281,7 +281,7 @@ class ShopSavvyClient @JvmOverloads constructor(
             .post(jsonBody.toRequestBody(mediaType))
             .build()
         return withContext(Dispatchers.IO) {
-            val response = okHttpClient.newCall(request).execute()
+            val response = httpClient.newCall(request).execute()
             val responseBody = response.body?.string() ?: "{}"
             @Suppress("UNCHECKED_CAST")
             org.json.JSONObject(responseBody).toMap() as Map<String, Any>
@@ -299,7 +299,7 @@ class ShopSavvyClient @JvmOverloads constructor(
             .get()
             .build()
         return withContext(Dispatchers.IO) {
-            val response = okHttpClient.newCall(request).execute()
+            val response = httpClient.newCall(request).execute()
             val responseBody = response.body?.string() ?: "{}"
             @Suppress("UNCHECKED_CAST")
             org.json.JSONObject(responseBody).toMap() as Map<String, Any>
@@ -313,7 +313,7 @@ class ShopSavvyClient @JvmOverloads constructor(
             .post(body.toRequestBody("application/json; charset=utf-8".toMediaType())).build()
         return withContext(Dispatchers.IO) {
             @Suppress("UNCHECKED_CAST")
-            org.json.JSONObject(okHttpClient.newCall(request).execute().body?.string() ?: "{}").toMap() as Map<String, Any>
+            org.json.JSONObject(httpClient.newCall(request).execute().body?.string() ?: "{}").toMap() as Map<String, Any>
         }
     }
 
@@ -322,7 +322,7 @@ class ShopSavvyClient @JvmOverloads constructor(
             .addHeader("Authorization", "Bearer $apiKey").addHeader("User-Agent", "ShopSavvy-Kotlin-SDK/$VERSION").get().build()
         return withContext(Dispatchers.IO) {
             @Suppress("UNCHECKED_CAST")
-            org.json.JSONObject(okHttpClient.newCall(request).execute().body?.string() ?: "{}").toMap() as Map<String, Any>
+            org.json.JSONObject(httpClient.newCall(request).execute().body?.string() ?: "{}").toMap() as Map<String, Any>
         }
     }
 
@@ -332,7 +332,7 @@ class ShopSavvyClient @JvmOverloads constructor(
             .post("".toRequestBody(null)).build()
         return withContext(Dispatchers.IO) {
             @Suppress("UNCHECKED_CAST")
-            org.json.JSONObject(okHttpClient.newCall(request).execute().body?.string() ?: "{}").toMap() as Map<String, Any>
+            org.json.JSONObject(httpClient.newCall(request).execute().body?.string() ?: "{}").toMap() as Map<String, Any>
         }
     }
 
@@ -341,7 +341,7 @@ class ShopSavvyClient @JvmOverloads constructor(
             .addHeader("Authorization", "Bearer $apiKey").addHeader("User-Agent", "ShopSavvy-Kotlin-SDK/$VERSION").delete().build()
         return withContext(Dispatchers.IO) {
             @Suppress("UNCHECKED_CAST")
-            org.json.JSONObject(okHttpClient.newCall(request).execute().body?.string() ?: "{}").toMap() as Map<String, Any>
+            org.json.JSONObject(httpClient.newCall(request).execute().body?.string() ?: "{}").toMap() as Map<String, Any>
         }
     }
 
