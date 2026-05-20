@@ -12,7 +12,7 @@ import java.util.regex.Pattern
 /**
  * SDK version
  */
-const val VERSION = "1.1.0"
+const val VERSION = "1.1.1"
 
 /**
  * Official Kotlin client for ShopSavvy Data API
@@ -330,6 +330,28 @@ class ShopSavvyClient @JvmOverloads constructor(
         val request = Request.Builder().url("$baseUrl/webhooks/$webhookId/test")
             .addHeader("Authorization", "Bearer $apiKey").addHeader("User-Agent", "ShopSavvy-Kotlin-SDK/$VERSION")
             .post("".toRequestBody(null)).build()
+        return withContext(Dispatchers.IO) {
+            @Suppress("UNCHECKED_CAST")
+            org.json.JSONObject(httpClient.newCall(request).execute().body?.string() ?: "{}").toMap() as Map<String, Any>
+        }
+    }
+
+    /**
+     * Update a webhook. All parameters are optional, but at least one of
+     * [url], [events], or [isActive] must be non-null.
+     */
+    suspend fun updateWebhook(webhookId: String, url: String? = null, events: List<String>? = null, isActive: Boolean? = null): Map<String, Any> {
+        require(url != null || events != null || isActive != null) {
+            "updateWebhook requires at least one of url, events, or isActive"
+        }
+        val payload = mutableMapOf<String, Any>()
+        if (url != null) payload["url"] = url
+        if (events != null) payload["events"] = events
+        if (isActive != null) payload["is_active"] = isActive
+        val body = org.json.JSONObject(payload as Map<*, *>).toString()
+        val request = Request.Builder().url("$baseUrl/webhooks/$webhookId")
+            .addHeader("Authorization", "Bearer $apiKey").addHeader("User-Agent", "ShopSavvy-Kotlin-SDK/$VERSION")
+            .put(body.toRequestBody("application/json; charset=utf-8".toMediaType())).build()
         return withContext(Dispatchers.IO) {
             @Suppress("UNCHECKED_CAST")
             org.json.JSONObject(httpClient.newCall(request).execute().body?.string() ?: "{}").toMap() as Map<String, Any>
