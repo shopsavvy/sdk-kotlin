@@ -90,6 +90,12 @@ data class ProductDetails(
     val categories: List<String>? = null,
     val attributes: Map<String, String>? = null,
     val rating: Map<String, kotlinx.serialization.json.JsonElement>? = null,
+    /**
+     * Expert quality scores on a 0-1 scale (multiply by 10 or 100 for
+     * display): "overall", "customer", "professional", plus an "aspects"
+     * map keyed by free-form aspect names from the product's professional
+     * reviews.
+     */
     val score: Map<String, kotlinx.serialization.json.JsonElement>? = null,
     val keywords: List<String>? = null,
     val identifiers: Map<String, kotlinx.serialization.json.JsonElement>? = null
@@ -361,6 +367,12 @@ data class TLDRReview(
     val pros: List<String> = emptyList(),
     val cons: List<String> = emptyList(),
     @SerialName("bottom_line") val bottomLine: String = "",
+    /**
+     * Expert quality scores on a 0-1 scale (multiply by 10 or 100 for
+     * display): "overall", "customer", "professional", plus an "aspects"
+     * map keyed by free-form aspect names from the product's professional
+     * reviews.
+     */
     val scores: Map<String, kotlinx.serialization.json.JsonElement>? = null
 )
 
