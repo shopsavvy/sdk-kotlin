@@ -140,13 +140,19 @@ data class ProductWithOffers(
 // MARK: - Offer Models
 
 /**
- * Historical price point
+ * Historical price point.
+ *
+ * The timestamp field is `timestamp`, matching the parent Offer's own `timestamp` and the
+ * real wire shape (`{availability, price, timestamp}`). Every SDK in the fleet declared it as
+ * a non-nullable `date` — a key the API has never sent — until 2026-08-10, which under
+ * kotlinx.serialization's default decoder is a `MissingFieldException` on a perfectly good
+ * 200 response (ShopSavvy prospector-audit s28-t2-2).
  */
 @Serializable
 data class PriceHistoryEntry(
-    val date: String,
+    val timestamp: String,
     val price: Double,
-    val availability: String
+    val availability: String? = null
 )
 
 /**
@@ -182,7 +188,11 @@ data class Offer(
 }
 
 /**
- * Offer with price history
+ * Offer returned by `getPriceHistory()`, i.e. one carrying its `history` array.
+ *
+ * This used to declare `@SerialName("price_history")`. The API has never sent a key by that
+ * name — history has always arrived under `history` — so `priceHistory` fell back to its
+ * `emptyList()` default on every successful response (ShopSavvy prospector-audit s28-t2-2).
  */
 @Serializable
 data class OfferWithHistory(
@@ -196,8 +206,7 @@ data class OfferWithHistory(
     val url: String? = null,
     val seller: String? = null,
     val timestamp: String? = null,
-    @SerialName("price_history")
-    val priceHistory: List<PriceHistoryEntry> = emptyList()
+    val history: List<PriceHistoryEntry> = emptyList()
 )
 
 // MARK: - Monitoring Models
