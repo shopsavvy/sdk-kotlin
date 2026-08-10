@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.shopsavvy"
-version = "1.2.0"
+version = "1.3.0"
 description = "Official Kotlin/JVM SDK for ShopSavvy Data API - Access product data, pricing, and price history"
 
 java {

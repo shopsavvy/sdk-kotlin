@@ -152,6 +152,11 @@ data class ProductWithOffers(
 data class PriceHistoryEntry(
     val timestamp: String,
     val price: Double,
+    /**
+     * ISO 4217 code [price] is denominated in. Null on an archived point with no recorded
+     * currency - never assume a missing value means USD (ShopSavvy prospector-audit d5-t3-1).
+     */
+    val currency: String? = null,
     val availability: String? = null
 )
 
