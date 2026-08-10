@@ -181,8 +181,12 @@ class ShopSavvyClient @JvmOverloads constructor(
         format: String? = null
     ): ApiResponse<List<OfferWithHistory>> {
         val urlBuilder = StringBuilder("$baseUrl/products/offers/history?ids=${java.net.URLEncoder.encode(identifier, "UTF-8")}")
-        urlBuilder.append("&start_date=$startDate")
-        urlBuilder.append("&end_date=$endDate")
+        // Wire params are "start"/"end" — what GET /products/offers/history
+        // reads, and what the OpenAPI spec and public docs document. The old
+        // "start_date"/"end_date" names came from the MCP tool's argument
+        // convention (a different interface entirely) and 400'd every call.
+        urlBuilder.append("&start=$startDate")
+        urlBuilder.append("&end=$endDate")
         retailer?.let { urlBuilder.append("&retailer=${java.net.URLEncoder.encode(it, "UTF-8")}") }
         format?.let { urlBuilder.append("&format=$it") }
 
