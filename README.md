@@ -170,14 +170,20 @@ println("Credits used: ${history.creditsUsed()}")
 
 ```kotlin
 // PUT /products/scheduled?ids=...&schedule=daily[&retailer=...]
+// Returns ApiResponse<List<ScheduledProduct>>: the full product fields plus `schedule`
+// and `retailer` (null when every retailer is refreshed).
 val scheduled = client.scheduleProductMonitoring("611247373064", "daily")
+scheduled.data.forEach { println("${it.shopsavvy} ${it.title} -> ${it.schedule}") }
+println("Credits used: ${scheduled.creditsUsed()}")
 client.scheduleProductsMonitoring(listOf("611247373064", "611247369449"), "hourly", retailer = "amazon.com")
 
-// GET /products/scheduled
+// GET /products/scheduled — same ScheduledProduct items; `schedule` is null for a refresh
+// interval the Data API has no label for
 client.getScheduledProducts().data.forEach { println("${it.title}: ${it.schedule} ${it.retailer ?: "all retailers"}") }
 
-// DELETE /products/scheduled?ids=...
-client.removeProductFromSchedule("611247373064")
+// DELETE /products/scheduled?ids=... — returns ScheduleRemovalResponse(success, message, meta), no data
+val removed = client.removeProductFromSchedule("611247373064")
+println(removed.message) // "Products successfully removed from schedule"
 client.removeProductsFromSchedule(listOf("611247373064", "611247369449"))
 ```
 
