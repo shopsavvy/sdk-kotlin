@@ -12,7 +12,7 @@ Official Kotlin SDK for the [ShopSavvy Data API](https://shopsavvy.com/data). Ac
 
 ```kotlin
 // Add to build.gradle.kts:
-// implementation("com.shopsavvy:shopsavvy-sdk-kotlin:1.0.0")
+// implementation("com.shopsavvy:shopsavvy-sdk-kotlin:1.4.0")
 
 // Use in Android/JVM:
 import com.shopsavvy.sdk.*
@@ -41,7 +41,7 @@ lifecycleScope.launch {
 
 ```kotlin
 dependencies {
-    implementation("com.shopsavvy:shopsavvy-sdk-kotlin:1.0.0")
+    implementation("com.shopsavvy:shopsavvy-sdk-kotlin:1.4.0")
     
     // For Android projects
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
@@ -54,7 +54,7 @@ dependencies {
 ### Gradle (Groovy)
 
 ```gradle
-implementation 'com.shopsavvy:shopsavvy-sdk-kotlin:1.0.0'
+implementation 'com.shopsavvy:shopsavvy-sdk-kotlin:1.4.0'
 implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 ```
 
@@ -64,7 +64,7 @@ implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 <dependency>
     <groupId>com.shopsavvy</groupId>
     <artifactId>shopsavvy-sdk-kotlin</artifactId>
-    <version>1.0.0</version>
+    <version>1.4.0</version>
 </dependency>
 ```
 
@@ -136,6 +136,34 @@ products.data.forEachIndexed { index, product ->
         else -> println("✓ Found: ${product.name} by ${product.brand ?: "Unknown"}")
     }
 }
+```
+
+### Price History
+
+`getPriceHistory` returns one entry per product found. Each product carries its `offers`, and
+each offer carries its own `history` (newest first). Dates are `YYYY-MM-DD`; the window may span
+at most 366 days.
+
+```kotlin
+val history = client.getPriceHistory(
+    identifier = "611247373064",
+    startDate = "2024-01-01",
+    endDate = "2024-01-31",
+    retailer = "amazon.com"   // optional
+)
+
+for (product in history.data) {                  // List<ProductWithOfferHistory>
+    println("${product.title} (${product.barcode})")
+    for (offer in product.offers) {              // List<OfferWithHistory>
+        println("  ${offer.retailer}: now ${offer.price} ${offer.currency}")
+        for (point in offer.history) {           // List<PriceHistoryEntry>
+            // currency is null on the rare archived point with no recorded currency;
+            // availability is null when it was unknown
+            println("    ${point.timestamp}  ${point.price} ${point.currency ?: "?"}  ${point.availability ?: ""}")
+        }
+    }
+}
+println("Credits used: ${history.creditsUsed()}")
 ```
 
 ### Real-Time Pricing
