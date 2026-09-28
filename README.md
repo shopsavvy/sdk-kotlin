@@ -166,6 +166,21 @@ for (product in history.data) {                  // List<ProductWithOfferHistory
 println("Credits used: ${history.creditsUsed()}")
 ```
 
+### Scheduled Refreshes
+
+```kotlin
+// PUT /products/scheduled?ids=...&schedule=daily[&retailer=...]
+val scheduled = client.scheduleProductMonitoring("611247373064", "daily")
+client.scheduleProductsMonitoring(listOf("611247373064", "611247369449"), "hourly", retailer = "amazon.com")
+
+// GET /products/scheduled
+client.getScheduledProducts().data.forEach { println("${it.title}: ${it.schedule} ${it.retailer ?: "all retailers"}") }
+
+// DELETE /products/scheduled?ids=...
+client.removeProductFromSchedule("611247373064")
+client.removeProductsFromSchedule(listOf("611247373064", "611247369449"))
+```
+
 ### Real-Time Pricing
 
 #### Android Compose Price Comparison

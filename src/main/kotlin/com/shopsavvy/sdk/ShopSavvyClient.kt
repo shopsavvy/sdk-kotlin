@@ -194,21 +194,44 @@ class ShopSavvyClient @JvmOverloads constructor(
     }
 
     // MARK: - Monitoring
+    //
+    // The scheduling endpoints read QUERY PARAMETERS only (`ids`, `schedule`, `retailer`);
+    // any request body is ignored. Before 1.4.0 these methods POSTed/DELETEd a JSON body
+    // ({identifier, frequency, retailer}) with no query string, so every call was rejected
+    // for a missing `ids`/`schedule`.
 
     /**
-     * Schedule product monitoring
+     * Schedule a product for regular refreshes
+     *
+     * Sends `PUT /products/scheduled?ids=…&schedule=…[&retailer=…]`.
      *
      * @param identifier Product identifier
      * @param frequency How often to refresh ('hourly', 'daily', 'weekly')
-     * @param retailer Optional retailer to monitor
-     * @return Scheduling confirmation
+     * @param retailer Optional retailer domain to limit the refresh to (e.g. "amazon.com")
+     * @return The products that were scheduled
      * @throws ShopSavvyException if the API request fails
      */
-    suspend fun scheduleProductMonitoring(identifier: String, frequency: String, retailer: String? = null): ApiResponse<ScheduleResponse> {
-        val url = "$baseUrl/products/schedule"
-        val request = ScheduleRequest(identifier, frequency, retailer)
+    suspend fun scheduleProductMonitoring(identifier: String, frequency: String, retailer: String? = null): ApiResponse<List<ScheduledProduct>> =
+        scheduleProductsMonitoring(listOf(identifier), frequency, retailer)
 
-        return executeRequest(url, "POST", request)
+    /**
+     * Schedule several products for regular refreshes in one request
+     *
+     * Sends `PUT /products/scheduled?ids=a,b,c&schedule=…[&retailer=…]`.
+     *
+     * @param identifiers Product identifiers
+     * @param frequency How often to refresh ('hourly', 'daily', 'weekly')
+     * @param retailer Optional retailer domain to limit the refresh to
+     * @return The products that were scheduled
+     * @throws ShopSavvyException if the API request fails
+     */
+    suspend fun scheduleProductsMonitoring(identifiers: List<String>, frequency: String, retailer: String? = null): ApiResponse<List<ScheduledProduct>> {
+        val ids = identifiers.joinToString(",") { java.net.URLEncoder.encode(it, "UTF-8") }
+        val urlBuilder = StringBuilder("$baseUrl/products/scheduled?ids=$ids")
+        urlBuilder.append("&schedule=${java.net.URLEncoder.encode(frequency, "UTF-8")}")
+        retailer?.let { urlBuilder.append("&retailer=${java.net.URLEncoder.encode(it, "UTF-8")}") }
+
+        return executeRequest(urlBuilder.toString(), "PUT")
     }
 
     /**
@@ -223,17 +246,29 @@ class ShopSavvyClient @JvmOverloads constructor(
     }
 
     /**
-     * Remove product from monitoring schedule
+     * Remove a product from the refresh schedule
+     *
+     * Sends `DELETE /products/scheduled?ids=…`.
      *
      * @param identifier Product identifier to remove
      * @return Removal confirmation
      * @throws ShopSavvyException if the API request fails
      */
-    suspend fun removeProductFromSchedule(identifier: String): ApiResponse<RemoveResponse> {
-        val url = "$baseUrl/products/schedule"
-        val request = RemoveRequest(identifier)
+    suspend fun removeProductFromSchedule(identifier: String): ScheduleRemovalResponse =
+        removeProductsFromSchedule(listOf(identifier))
 
-        return executeRequest(url, "DELETE", request)
+    /**
+     * Remove several products from the refresh schedule in one request
+     *
+     * Sends `DELETE /products/scheduled?ids=a,b,c`.
+     *
+     * @param identifiers Product identifiers to remove
+     * @return Removal confirmation
+     * @throws ShopSavvyException if the API request fails
+     */
+    suspend fun removeProductsFromSchedule(identifiers: List<String>): ScheduleRemovalResponse {
+        val ids = identifiers.joinToString(",") { java.net.URLEncoder.encode(it, "UTF-8") }
+        return executeRequest("$baseUrl/products/scheduled?ids=$ids", "DELETE")
     }
 
     // MARK: - Usage
@@ -396,11 +431,18 @@ class ShopSavvyClient @JvmOverloads constructor(
                 } ?: "".toRequestBody("application/json".toMediaType())
                 requestBuilder.post(requestBody)
             }
-            "DELETE" -> {
+            "PUT" -> {
                 val requestBody = body?.let {
                     json.encodeToString(kotlinx.serialization.serializer(), it)
                         .toRequestBody("application/json".toMediaType())
                 } ?: "".toRequestBody("application/json".toMediaType())
+                requestBuilder.put(requestBody)
+            }
+            "DELETE" -> {
+                val requestBody = body?.let {
+                    json.encodeToString(kotlinx.serialization.serializer(), it)
+                        .toRequestBody("application/json".toMediaType())
+                }
                 requestBuilder.delete(requestBody)
             }
             else -> requestBuilder.get()

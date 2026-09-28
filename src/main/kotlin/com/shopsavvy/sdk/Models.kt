@@ -265,8 +265,53 @@ data class OfferWithHistory(
 // MARK: - Monitoring Models
 
 /**
- * Request model for scheduling product monitoring
+ * A product on the caller's refresh schedule, as returned by `getScheduledProducts()` and by
+ * the schedule calls: the standard product fields plus the refresh `schedule` and, when the
+ * schedule is limited to one retailer, that `retailer`.
+ *
+ * Until 1.4.0 this was modelled as `{product_id, identifier, frequency, created_at}` — keys
+ * the API has never sent — so decoding any scheduling response failed on a real 200.
  */
+@Serializable
+data class ScheduledProduct(
+    val title: String,
+    val shopsavvy: String,
+    val brand: String? = null,
+    val category: String? = null,
+    val images: List<String>? = null,
+    val barcode: String? = null,
+    val amazon: String? = null,
+    val model: String? = null,
+    val mpn: String? = null,
+    val color: String? = null,
+    @SerialName("title_short") val titleShort: String? = null,
+    val slug: String? = null,
+    val description: String? = null,
+    val categories: List<String>? = null,
+    val attributes: Map<String, String>? = null,
+    val rating: Map<String, kotlinx.serialization.json.JsonElement>? = null,
+    val score: Map<String, kotlinx.serialization.json.JsonElement>? = null,
+    val keywords: List<String>? = null,
+    val identifiers: Map<String, kotlinx.serialization.json.JsonElement>? = null,
+    /** "hourly", "daily" or "weekly". Null for a refresh interval with no Data API label. */
+    val schedule: String? = null,
+    /** Retailer the schedule is limited to, when one was given. */
+    val retailer: String? = null
+)
+
+/**
+ * Response from removing products from the schedule. The API sends no `data` for this call,
+ * only `success`, a `message` and `meta`.
+ */
+@Serializable
+data class ScheduleRemovalResponse(
+    val success: Boolean,
+    val message: String? = null,
+    val meta: ApiMeta? = null
+)
+
+/** @deprecated The scheduling endpoints read query parameters only; no request body is sent. */
+@Deprecated("The scheduling endpoints take query parameters, not a request body")
 @Serializable
 data class ScheduleRequest(
     val identifier: String,
@@ -274,9 +319,8 @@ data class ScheduleRequest(
     val retailer: String? = null
 )
 
-/**
- * Response model for scheduling operations
- */
+/** @deprecated Scheduling returns ApiResponse<List<ScheduledProduct>>. */
+@Deprecated("Scheduling returns ApiResponse<List<ScheduledProduct>>")
 @Serializable
 data class ScheduleResponse(
     val scheduled: Boolean,
@@ -284,9 +328,8 @@ data class ScheduleResponse(
     val productId: String
 )
 
-/**
- * Response from batch scheduling
- */
+/** @deprecated Scheduling returns ApiResponse<List<ScheduledProduct>>. */
+@Deprecated("Scheduling returns ApiResponse<List<ScheduledProduct>>")
 @Serializable
 data class ScheduleBatchResponse(
     val identifier: String,
@@ -295,41 +338,22 @@ data class ScheduleBatchResponse(
     val productId: String
 )
 
-/**
- * Scheduled product model
- */
-@Serializable
-data class ScheduledProduct(
-    @SerialName("product_id")
-    val productId: String,
-    val identifier: String,
-    val frequency: String,
-    val retailer: String? = null,
-    @SerialName("created_at")
-    val createdAt: String,
-    @SerialName("last_refreshed")
-    val lastRefreshed: String? = null
-)
-
-/**
- * Request model for removing scheduled products
- */
+/** @deprecated The scheduling endpoints take query parameters, not a request body. */
+@Deprecated("The scheduling endpoints take query parameters, not a request body")
 @Serializable
 data class RemoveRequest(
     val identifier: String
 )
 
-/**
- * Response model for removal operations
- */
+/** @deprecated Removal returns ScheduleRemovalResponse. */
+@Deprecated("Removal returns ScheduleRemovalResponse")
 @Serializable
 data class RemoveResponse(
     val removed: Boolean
 )
 
-/**
- * Response from batch removal
- */
+/** @deprecated Removal returns ScheduleRemovalResponse. */
+@Deprecated("Removal returns ScheduleRemovalResponse")
 @Serializable
 data class RemoveBatchResponse(
     val identifier: String,
