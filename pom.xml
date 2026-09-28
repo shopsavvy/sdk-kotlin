@@ -85,7 +85,7 @@
         <!-- Test Dependencies -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test</artifactId>
+            <artifactId>kotlin-test-junit5</artifactId>
             <version>${kotlin.version}</version>
             <scope>test</scope>
         </dependency>
@@ -110,6 +110,13 @@
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
 
         <plugins>
+            <plugin>
+                <!-- Surefire 3 discovers the JUnit 5 tests kotlin-test-junit5 runs on -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+            </plugin>
+
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>

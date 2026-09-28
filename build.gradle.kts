@@ -21,6 +21,9 @@ repositories {
 dependencies {
     // HTTP Client
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
+
+    // org.json backs the batch/webhook helpers (already declared in pom.xml)
+    implementation("org.json:json:20240303")
     
     // JSON Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
