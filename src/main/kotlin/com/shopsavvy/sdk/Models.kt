@@ -10,6 +10,8 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class ApiMeta(
+    @SerialName("request_id")
+    val requestId: String? = null,
     @SerialName("credits_used")
     val creditsUsed: Int,
     @SerialName("credits_remaining")
@@ -134,7 +136,51 @@ data class ProductWithOffers(
     val model: String? = null,
     val mpn: String? = null,
     val color: String? = null,
+    @SerialName("title_short") val titleShort: String? = null,
+    val slug: String? = null,
+    val description: String? = null,
+    val categories: List<String>? = null,
+    val attributes: Map<String, String>? = null,
+    val rating: Map<String, kotlinx.serialization.json.JsonElement>? = null,
+    val score: Map<String, kotlinx.serialization.json.JsonElement>? = null,
+    val keywords: List<String>? = null,
+    val identifiers: Map<String, kotlinx.serialization.json.JsonElement>? = null,
     val offers: List<Offer> = emptyList()
+)
+
+/**
+ * One product in a `getPriceHistory()` response.
+ *
+ * `GET /products/offers/history` returns one entry PER PRODUCT — the same product fields as
+ * the products/offers endpoints — with each of that product's offers carrying its own
+ * `history` array. Until 1.4.0 the SDK decoded `data` as a flat `List<OfferWithHistory>`,
+ * which is not the wire shape: every element is a product, so the decoder failed on the
+ * missing offer `id` of a real 200 response.
+ */
+@Serializable
+data class ProductWithOfferHistory(
+    val title: String,
+    val shopsavvy: String,
+    val brand: String? = null,
+    val category: String? = null,
+    val images: List<String>? = null,
+    /** String on the wire (never a number), e.g. "611247373064". */
+    val barcode: String? = null,
+    val amazon: String? = null,
+    val model: String? = null,
+    val mpn: String? = null,
+    val color: String? = null,
+    @SerialName("title_short") val titleShort: String? = null,
+    val slug: String? = null,
+    val description: String? = null,
+    val categories: List<String>? = null,
+    val attributes: Map<String, String>? = null,
+    val rating: Map<String, kotlinx.serialization.json.JsonElement>? = null,
+    val score: Map<String, kotlinx.serialization.json.JsonElement>? = null,
+    val keywords: List<String>? = null,
+    val identifiers: Map<String, kotlinx.serialization.json.JsonElement>? = null,
+    /** Every offer for this product, each with its own price history. */
+    val offers: List<OfferWithHistory> = emptyList()
 )
 
 // MARK: - Offer Models
@@ -143,7 +189,8 @@ data class ProductWithOffers(
  * Historical price point.
  *
  * The timestamp field is `timestamp`, matching the parent Offer's own `timestamp` and the
- * real wire shape (`{availability, price, timestamp}`). Every SDK in the fleet declared it as
+ * real wire shape (`{availability, price, currency, timestamp}`). The API only returns points
+ * with a positive price and always sets `timestamp`; points arrive newest-first. Every SDK in the fleet declared it as
  * a non-nullable `date` — a key the API has never sent — until 2026-08-10, which under
  * kotlinx.serialization's default decoder is a `MissingFieldException` on a perfectly good
  * 200 response (ShopSavvy prospector-audit s28-t2-2).
@@ -193,7 +240,8 @@ data class Offer(
 }
 
 /**
- * Offer returned by `getPriceHistory()`, i.e. one carrying its `history` array.
+ * Offer returned inside each [ProductWithOfferHistory] by `getPriceHistory()`: every field of
+ * [Offer] plus its `history` array (empty for listings that carry no history, e.g. eBay).
  *
  * This used to declare `@SerialName("price_history")`. The API has never sent a key by that
  * name — history has always arrived under `history` — so `priceHistory` fell back to its
