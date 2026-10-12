@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation](https://img.shields.io/badge/docs-shopsavvy.com-blue)](https://shopsavvy.com/data/documentation)
 
-Official Kotlin SDK for the [ShopSavvy Data API](https://shopsavvy.com/data). Access comprehensive product data, real-time pricing, and historical price trends across **thousands of retailers** and **millions of products**. Built for **Android**, **JVM**, and **Kotlin Multiplatform** projects.
+Official Kotlin SDK for the [ShopSavvy Data API](https://shopsavvy.com/data). Access comprehensive product data, real-time pricing, and historical price trends across **tens of thousands of retailers** and **tens of millions of products**. Built for **Android**, **JVM**, and **Kotlin Multiplatform** projects.
 
 ## ⚡ 30-Second Quick Start
 
@@ -121,7 +121,7 @@ product.data.modelNumber?.let { println("🔧 Model: $it") }
 
 #### Bulk Product Lookup
 ```kotlin
-// Process up to 100 products at once (Pro plan)
+// Up to 100 identifiers per request
 val identifiers = listOf(
     "012345678901", "B08N5WRWNW", "045496590048",
     "https://www.bestbuy.com/site/product/123456",
@@ -900,7 +900,7 @@ ShopSavvy has been comparing prices since 2008, and the app has 40M+ downloads. 
 - **JSON or CSV** responses, with credits used and remaining on every response
 - **Open-source SDKs in 10 languages**: Python, TypeScript, Go, Rust, Java, Kotlin, Swift, PHP, Ruby and C#
 
-Plans and the 14-day Starter trial are at [shopsavvy.com/data](https://shopsavvy.com/data); full reference at [shopsavvy.com/data/documentation](https://shopsavvy.com/data/documentation).
+Plans and the 14-day trial are at [shopsavvy.com/data](https://shopsavvy.com/data); full reference at [shopsavvy.com/data/documentation](https://shopsavvy.com/data/documentation).
 
 ### Perfect for Kotlin & Android:
 - 🚀 **Coroutines-first** - Built for modern async programming
