@@ -12,7 +12,7 @@ import java.util.regex.Pattern
 /**
  * SDK version
  */
-const val VERSION = "1.4.0"
+const val VERSION = "1.5.0"
 
 /**
  * Official Kotlin client for ShopSavvy Data API

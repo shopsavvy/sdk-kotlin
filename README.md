@@ -8,11 +8,22 @@
 
 Official Kotlin SDK for the [ShopSavvy Data API](https://shopsavvy.com/data). Access comprehensive product data, real-time pricing, and historical price trends across **tens of thousands of retailers** and **30M+ products**. Built for **Android**, **JVM**, and **Kotlin Multiplatform** projects.
 
+### In-Store Prices (user-collected)
+
+Each product from the current-offers call also carries `in_store_prices`: shelf prices physical stores charged, read from receipts ShopSavvy app users scanned. Every entry is labeled `source: "user-collected"` and has the retailer, the store's address and coordinates, the price and the receipt date (`observed_on`). It is a price on that day, not current stock, and says nothing about the shopper. Empty when none are on file.
+
+```kotlin
+val response = client.getCurrentOffers("011110838360")
+response.data.first().inStorePrices.forEach { inStore ->
+    println("${inStore.retailer} (${inStore.store.address}): ${inStore.price} ${inStore.currency} on ${inStore.observedOn}")
+}
+```
+
 ## ⚡ 30-Second Quick Start
 
 ```kotlin
 // Add to build.gradle.kts:
-// implementation("com.shopsavvy:shopsavvy-sdk-kotlin:1.4.0")
+// implementation("com.shopsavvy:shopsavvy-sdk-kotlin:1.5.0")
 
 // Use in Android/JVM:
 import com.shopsavvy.sdk.*
@@ -41,7 +52,7 @@ lifecycleScope.launch {
 
 ```kotlin
 dependencies {
-    implementation("com.shopsavvy:shopsavvy-sdk-kotlin:1.4.0")
+    implementation("com.shopsavvy:shopsavvy-sdk-kotlin:1.5.0")
     
     // For Android projects
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
@@ -54,7 +65,7 @@ dependencies {
 ### Gradle (Groovy)
 
 ```gradle
-implementation 'com.shopsavvy:shopsavvy-sdk-kotlin:1.4.0'
+implementation 'com.shopsavvy:shopsavvy-sdk-kotlin:1.5.0'
 implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 ```
 

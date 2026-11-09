@@ -145,7 +145,35 @@ data class ProductWithOffers(
     val score: Map<String, kotlinx.serialization.json.JsonElement>? = null,
     val keywords: List<String>? = null,
     val identifiers: Map<String, kotlinx.serialization.json.JsonElement>? = null,
-    val offers: List<Offer> = emptyList()
+    val offers: List<Offer> = emptyList(),
+    /** User-collected in-store shelf prices read from shoppers' scanned receipts; empty when none are on file. */
+    @SerialName("in_store_prices") val inStorePrices: List<InStorePrice> = emptyList()
+)
+
+/**
+ * A shelf price a physical store charged on a given day, read from a shopper's scanned
+ * receipt. [source] is always `"user-collected"`. It says what the store sold the product for
+ * that day, not that it is in stock now; nothing about the shopper is included.
+ */
+@Serializable
+data class InStorePrice(
+    val source: String = "user-collected",
+    val retailer: String? = null,
+    val store: InStoreLocation = InStoreLocation(),
+    /** Unit shelf price paid (the median when several receipts from the store agree). */
+    val price: Double,
+    val currency: String,
+    /** YYYY-MM-DD date of the most recent receipt behind the price. */
+    @SerialName("observed_on") val observedOn: String? = null,
+    val timestamp: String? = null
+)
+
+/** The store an [InStorePrice] was charged at. */
+@Serializable
+data class InStoreLocation(
+    val address: String? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null
 )
 
 /**
