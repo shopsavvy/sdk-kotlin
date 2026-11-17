@@ -2,6 +2,9 @@ package com.shopsavvy.sdk
 
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.jsonObject
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -12,7 +15,7 @@ import java.util.regex.Pattern
 /**
  * SDK version
  */
-const val VERSION = "1.5.0"
+const val VERSION = "1.6.0"
 
 /**
  * Official Kotlin client for ShopSavvy Data API
@@ -319,12 +322,7 @@ class ShopSavvyClient @JvmOverloads constructor(
             .addHeader("User-Agent", "ShopSavvy-Kotlin-SDK/$VERSION")
             .post(jsonBody.toRequestBody(mediaType))
             .build()
-        return withContext(Dispatchers.IO) {
-            val response = httpClient.newCall(request).execute()
-            val responseBody = response.body?.string() ?: "{}"
-            @Suppress("UNCHECKED_CAST")
-            org.json.JSONObject(responseBody).toMap() as Map<String, Any>
-        }
+        return executeRawMap(request)
     }
 
     /**
@@ -337,12 +335,7 @@ class ShopSavvyClient @JvmOverloads constructor(
             .addHeader("User-Agent", "ShopSavvy-Kotlin-SDK/$VERSION")
             .get()
             .build()
-        return withContext(Dispatchers.IO) {
-            val response = httpClient.newCall(request).execute()
-            val responseBody = response.body?.string() ?: "{}"
-            @Suppress("UNCHECKED_CAST")
-            org.json.JSONObject(responseBody).toMap() as Map<String, Any>
-        }
+        return executeRawMap(request)
     }
 
     suspend fun createWebhook(url: String, events: List<String>): Map<String, Any> {
@@ -350,29 +343,20 @@ class ShopSavvyClient @JvmOverloads constructor(
         val request = Request.Builder().url("$baseUrl/webhooks")
             .addHeader("Authorization", "Bearer $apiKey").addHeader("User-Agent", "ShopSavvy-Kotlin-SDK/$VERSION")
             .post(body.toRequestBody("application/json; charset=utf-8".toMediaType())).build()
-        return withContext(Dispatchers.IO) {
-            @Suppress("UNCHECKED_CAST")
-            org.json.JSONObject(httpClient.newCall(request).execute().body?.string() ?: "{}").toMap() as Map<String, Any>
-        }
+        return executeRawMap(request)
     }
 
     suspend fun listWebhooks(): Map<String, Any> {
         val request = Request.Builder().url("$baseUrl/webhooks")
             .addHeader("Authorization", "Bearer $apiKey").addHeader("User-Agent", "ShopSavvy-Kotlin-SDK/$VERSION").get().build()
-        return withContext(Dispatchers.IO) {
-            @Suppress("UNCHECKED_CAST")
-            org.json.JSONObject(httpClient.newCall(request).execute().body?.string() ?: "{}").toMap() as Map<String, Any>
-        }
+        return executeRawMap(request)
     }
 
     suspend fun testWebhook(webhookId: String): Map<String, Any> {
         val request = Request.Builder().url("$baseUrl/webhooks/$webhookId/test")
             .addHeader("Authorization", "Bearer $apiKey").addHeader("User-Agent", "ShopSavvy-Kotlin-SDK/$VERSION")
             .post("".toRequestBody(null)).build()
-        return withContext(Dispatchers.IO) {
-            @Suppress("UNCHECKED_CAST")
-            org.json.JSONObject(httpClient.newCall(request).execute().body?.string() ?: "{}").toMap() as Map<String, Any>
-        }
+        return executeRawMap(request)
     }
 
     /**
@@ -391,19 +375,13 @@ class ShopSavvyClient @JvmOverloads constructor(
         val request = Request.Builder().url("$baseUrl/webhooks/$webhookId")
             .addHeader("Authorization", "Bearer $apiKey").addHeader("User-Agent", "ShopSavvy-Kotlin-SDK/$VERSION")
             .put(body.toRequestBody("application/json; charset=utf-8".toMediaType())).build()
-        return withContext(Dispatchers.IO) {
-            @Suppress("UNCHECKED_CAST")
-            org.json.JSONObject(httpClient.newCall(request).execute().body?.string() ?: "{}").toMap() as Map<String, Any>
-        }
+        return executeRawMap(request)
     }
 
     suspend fun deleteWebhook(webhookId: String): Map<String, Any> {
         val request = Request.Builder().url("$baseUrl/webhooks/$webhookId")
             .addHeader("Authorization", "Bearer $apiKey").addHeader("User-Agent", "ShopSavvy-Kotlin-SDK/$VERSION").delete().build()
-        return withContext(Dispatchers.IO) {
-            @Suppress("UNCHECKED_CAST")
-            org.json.JSONObject(httpClient.newCall(request).execute().body?.string() ?: "{}").toMap() as Map<String, Any>
-        }
+        return executeRawMap(request)
     }
 
     /**
@@ -455,7 +433,7 @@ class ShopSavvyClient @JvmOverloads constructor(
                 val responseBody = response.body?.string() ?: ""
 
                 if (!response.isSuccessful) {
-                    throw createExceptionFromResponse(response.code, responseBody)
+                    throw createExceptionFromResponse(response, responseBody)
                 }
 
                 json.decodeFromString<T>(responseBody)
@@ -465,22 +443,62 @@ class ShopSavvyClient @JvmOverloads constructor(
         }
     }
 
-    private fun createExceptionFromResponse(statusCode: Int, responseBody: String): ShopSavvyException {
-        val errorMessage = try {
-            val errorResponse = json.decodeFromString<Map<String, String>>(responseBody)
-            errorResponse["error"] ?: "Unknown error"
-        } catch (e: Exception) {
-            responseBody.ifEmpty { "Unknown error" }
-        }
-
-        return when (statusCode) {
-            401 -> ShopSavvyAuthenticationException("Authentication failed. Check your API key.")
-            404 -> ShopSavvyNotFoundException("Resource not found")
-            422 -> ShopSavvyValidationException("Request validation failed. Check your parameters.")
-            429 -> ShopSavvyRateLimitException("Rate limit exceeded. Please slow down your requests.")
-            else -> ShopSavvyException("HTTP $statusCode: $errorMessage")
+    private suspend fun executeRawMap(request: Request): Map<String, Any> = withContext(Dispatchers.IO) {
+        try {
+            httpClient.newCall(request).execute().use { response ->
+                val responseBody = response.body?.string() ?: "{}"
+                if (!response.isSuccessful) {
+                    throw createExceptionFromResponse(response, responseBody)
+                }
+                @Suppress("UNCHECKED_CAST")
+                org.json.JSONObject(responseBody).toMap() as Map<String, Any>
+            }
+        } catch (e: IOException) {
+            throw ShopSavvyNetworkException("Network error: ${e.message}", e)
         }
     }
+
+    private fun createExceptionFromResponse(response: Response, responseBody: String): ShopSavvyException {
+        val statusCode = response.code
+        var errorMessage: String? = null
+        var code: String? = null
+        var action: String? = null
+        var docsUrl: String? = null
+        var requestId: String? = null
+        try {
+            val root = json.parseToJsonElement(responseBody).jsonObject
+            errorMessage = (root["error"] as? JsonPrimitive)?.takeIf { it.isString }?.content
+            val detail = root["error_detail"] as? JsonObject
+            if (detail != null) {
+                code = detail.stringOrNull("code")
+                action = detail.stringOrNull("action")
+                docsUrl = detail.stringOrNull("docs_url")
+                if (errorMessage == null) errorMessage = detail.stringOrNull("message")
+            }
+            requestId = (root["meta"] as? JsonObject)?.stringOrNull("request_id")
+        } catch (e: Exception) {
+            // Body was not JSON; the raw text is used below.
+        }
+        val message = errorMessage ?: responseBody.ifEmpty { "Unknown error" }
+        val retryAfter = response.header("Retry-After")?.trim()?.toIntOrNull()
+
+        if (code == "ERR_CREDITS_EXHAUSTED") {
+            return ShopSavvyCreditsExhaustedException(message, null, statusCode, code, action, docsUrl, requestId, retryAfter)
+        }
+        if (code == "ERR_RATE_LIMIT") {
+            return ShopSavvyRateLimitException("Rate limit exceeded. Please slow down your requests.", null, statusCode, code, action, docsUrl, requestId, retryAfter)
+        }
+        return when (statusCode) {
+            401 -> ShopSavvyAuthenticationException("Authentication failed. Check your API key.", null, statusCode, code, action, docsUrl, requestId, retryAfter)
+            404 -> ShopSavvyNotFoundException("Resource not found", null, statusCode, code, action, docsUrl, requestId, retryAfter)
+            400, 422 -> ShopSavvyValidationException("Request validation failed. Check your parameters.", null, statusCode, code, action, docsUrl, requestId, retryAfter)
+            429 -> ShopSavvyRateLimitException("Rate limit exceeded. Please slow down your requests.", null, statusCode, code, action, docsUrl, requestId, retryAfter)
+            else -> ShopSavvyException("HTTP $statusCode: $message", null, statusCode, code, action, docsUrl, requestId, retryAfter)
+        }
+    }
+
+    private fun JsonObject.stringOrNull(key: String): String? =
+        (this[key] as? JsonPrimitive)?.takeIf { it.isString }?.content
 
     override fun close() {
         httpClient.dispatcher.executorService.shutdown()
