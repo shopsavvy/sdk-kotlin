@@ -21,22 +21,23 @@ response.data.first().inStorePrices.forEach { inStore ->
 
 ## ⚡ 30-Second Quick Start
 
+Add `implementation("com.shopsavvy:shopsavvy-sdk-kotlin:1.6.0")`, set `SHOPSAVVY_API_KEY`, and run:
+
 ```kotlin
-// Add to build.gradle.kts:
-// implementation("com.shopsavvy:shopsavvy-sdk-kotlin:1.5.0")
+import com.shopsavvy.sdk.ShopSavvyClient
+import kotlinx.coroutines.runBlocking
 
-// Use in Android/JVM:
-import com.shopsavvy.sdk.*
-import kotlinx.coroutines.*
-
-val client = ShopSavvyClient("ss_live_your_api_key_here")
-
-lifecycleScope.launch {
-    val product = client.getProductDetails("012345678901")
-    val offers = client.getCurrentOffers("012345678901")
-    val bestOffer = offers.data.minByOrNull { it.price ?: Double.MAX_VALUE }
-    
-    println("${product.data.name} - Best price: $${bestOffer?.price} at ${bestOffer?.retailer}")
+fun main() = runBlocking {
+    ShopSavvyClient(System.getenv("SHOPSAVVY_API_KEY")).use { client ->
+        // Keurig K-Mini
+        val product = client.getCurrentOffers("611247373064").data.first()
+        val cheapest = product.offers.filter { it.price != null }.minByOrNull { it.price!! }
+        if (cheapest == null) {
+            println("${product.title}: no offers right now")
+        } else {
+            println("${product.title}: cheapest is \$${cheapest.price} at ${cheapest.retailer}")
+        }
+    }
 }
 ```
 
@@ -52,7 +53,7 @@ lifecycleScope.launch {
 
 ```kotlin
 dependencies {
-    implementation("com.shopsavvy:shopsavvy-sdk-kotlin:1.5.0")
+    implementation("com.shopsavvy:shopsavvy-sdk-kotlin:1.6.0")
     
     // For Android projects
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
@@ -65,7 +66,7 @@ dependencies {
 ### Gradle (Groovy)
 
 ```gradle
-implementation 'com.shopsavvy:shopsavvy-sdk-kotlin:1.5.0'
+implementation 'com.shopsavvy:shopsavvy-sdk-kotlin:1.6.0'
 implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 ```
 
@@ -75,15 +76,15 @@ implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 <dependency>
     <groupId>com.shopsavvy</groupId>
     <artifactId>shopsavvy-sdk-kotlin</artifactId>
-    <version>1.4.0</version>
+    <version>1.6.0</version>
 </dependency>
 ```
 
 ### Get Your API Key
 
-1. **Sign up**: Visit [shopsavvy.com/data](https://shopsavvy.com/data)
-2. **Choose plan**: Select based on your usage needs  
-3. **Get API key**: Copy from your dashboard
+1. **Start a plan**: Visit [shopsavvy.com/data](https://shopsavvy.com/data)
+2. **Get an API key**: Create one at [shopsavvy.com/data/api-keys](https://shopsavvy.com/data/api-keys) after starting a plan
+3. **Export it**: `export SHOPSAVVY_API_KEY=ss_live_...`
 4. **Test**: Run the 30-second example above
 
 ## 📖 Complete API Reference
@@ -673,6 +674,35 @@ actual class PlatformShopSavvyClient {
 }
 ```
 
+## Errors, rate limits and credits
+
+Every API error is a `ShopSavvyException` (or a subclass) carrying `code`, `action`, `docsUrl`, `requestId`, `statusCode` and `retryAfterSeconds`. Each is `null` when the server did not send it.
+
+Two different errors share HTTP 429, so catch them separately:
+
+- `ShopSavvyRateLimitException` (`ERR_RATE_LIMIT`): wait `retryAfterSeconds` seconds, then retry.
+- `ShopSavvyCreditsExhaustedException` (`ERR_CREDITS_EXHAUSTED`): do not retry. Credits come back when the billing period resets or the plan is upgraded. It is not a subclass of the rate-limit exception.
+
+The SDK never retries on its own.
+
+```kotlin
+suspend fun offersWithOneRetry(client: ShopSavvyClient) =
+    try {
+        client.getCurrentOffers("611247373064")
+    } catch (e: ShopSavvyRateLimitException) {
+        delay((e.retryAfterSeconds ?: 1) * 1000L)
+        client.getCurrentOffers("611247373064") // retry once
+    } catch (e: ShopSavvyCreditsExhaustedException) {
+        println("Credits are used up. Retrying will not help: ${e.docsUrl}")
+        null
+    } catch (e: ShopSavvyException) {
+        println("${e.code}: ${e.message}")
+        println("Fix: ${e.action}")
+        println("Docs: ${e.docsUrl}")
+        null
+    }
+```
+
 ## Exception Handling
 
 The SDK provides comprehensive exception handling with Kotlin-specific patterns:
@@ -925,4 +955,4 @@ Plans and the 14-day trial are at [shopsavvy.com/data](https://shopsavvy.com/dat
 
 ---
 
-**Ready to get started?** [Sign up for your API key](https://shopsavvy.com/data) • **Need help?** [Contact us](mailto:business@shopsavvy.com)
+**Ready to get started?** [Get your API key](https://shopsavvy.com/data/api-keys) • **Need help?** [Contact us](mailto:business@shopsavvy.com)

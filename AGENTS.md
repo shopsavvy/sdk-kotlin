@@ -17,7 +17,7 @@ The official SDK for the [ShopSavvy Data API](https://shopsavvy.com/data) in Kot
 - `src/main/kotlin/com/shopsavvy/sdk/ShopSavvyClient.kt`: suspend functions per endpoint and `VERSION`
 - `src/main/kotlin/com/shopsavvy/sdk/Models.kt`: kotlinx.serialization models
 - `src/main/kotlin/com/shopsavvy/sdk/Exceptions.kt`: error types
-- `src/test/kotlin/com/shopsavvy/sdk/`: tests with OkHttp MockWebServer
+- `src/test/kotlin/com/shopsavvy/sdk/`: tests with OkHttp MockWebServer (`ErrorsTest` has one opt-in live check: `SHOPSAVVY_LIVE_TESTS=1`)
 - `build.gradle.kts` (and `pom.xml` for the Maven release)
 
 ## Commands
@@ -38,7 +38,7 @@ The official SDK for the [ShopSavvy Data API](https://shopsavvy.com/data) in Kot
 - Serialized field names (JSON tags, annotations, CodingKeys, model attributes) match the API JSON exactly (`shopsavvy`, `barcode`, `amazon`, `model`, `mpn`, `offers`, `retailer`, `price`, `availability`, `timestamp`, `history`, `meta.credits_used`, `meta.credits_remaining`, `meta.rate_limit_remaining`). Add a friendlier alias only alongside the real name, never instead of it.
 - Identifiers go in the `ids` query parameter, comma-separated, up to 100 per request (`id` for reviews). The API does not read `barcode=`, `upc=` or `asin=`.
 - `availability` is `"in"` or `"out"` and is absent when unknown. Treat absent as unknown, never as in stock. `currency` on a history point can be null; never assume USD for it.
-- Map errors from `error_detail.code` (`ERR_AUTH_MISSING`, `ERR_RATE_LIMIT`, `ERR_CREDITS_EXHAUSTED`, ...), not from the HTTP status: two different codes share 429. Surface `Retry-After` on `ERR_RATE_LIMIT`.
+- Map errors from `error_detail.code` (`ERR_AUTH_MISSING`, `ERR_RATE_LIMIT`, `ERR_CREDITS_EXHAUSTED`, ...), not from the HTTP status: two different codes share 429. Surface `Retry-After` on `ERR_RATE_LIMIT`. `ShopSavvyCreditsExhaustedException` (`ERR_CREDITS_EXHAUSTED`) must never extend `ShopSavvyRateLimitException`, so retry-on-rate-limit code cannot loop on exhausted credits. Every exception carries `code`, `action`, `docsUrl`, `requestId`, `statusCode`, `retryAfterSeconds`. The SDK does not retry on its own.
 - Authenticate with `Authorization: Bearer <key>`. Examples and docs read the key from the `SHOPSAVVY_API_KEY` environment variable.
 - Public API is `suspend` functions; nullable types for optional API fields.
 - `gradle.properties` holds only build settings. Publishing credentials live in `~/.m2/settings.xml` or `~/.gradle/gradle.properties` on the maintainer machine, never here.
